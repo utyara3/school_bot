@@ -18,9 +18,26 @@ async def start_cmd(message: Message) -> None:
         reply_markup=kb_reply.start_kb().as_markup(resize_keyboard=True)
     )
 
+
 @router.message(F.text.lower().contains('поддержка'))
 @router.message(Command('support'))
 async def support(message: Message, state: FSMContext) -> None:
     await message.answer(msg.COMMON['support'])
 
     await state.set_state(states.Support.waiting_message)
+
+
+@router.message(F.text, states.Support.waiting_message)
+async def send_to_supports(message: Message, state: FSMContext) -> None:
+    #get supports id from db
+    #send message to supports
+    await state.clear()
+
+    await message.answer(msg.COMMON['sent_to_support'])
+
+
+@router.message(Command('cancel'))
+async def cancel_cmd(message: Message, state: FSMContext) -> None:
+    await state.clear()
+
+    await message.answer(msg.COMMON['cancel'])

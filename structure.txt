@@ -1,0 +1,59 @@
+school_bot/
+├── requirements.txt           # Зависимости
+├── main.py                   # Точка входа
+├── config.py                 # Конфигурация
+├── .env.example              # Пример env файла
+├── .env                      # Локальные переменные (в gitignore)
+├── .gitignore
+├── README.md
+├── database/
+│   ├── __init__.py
+│   ├── base.py               # Подключение к БД
+│   ├── models.py             # Модели данных
+│   └── repositories/         # Репозитории для работы с данными
+│       ├── __init__.py
+│       ├── users.py
+│       ├── schedule.py
+│       ├── teachers.py
+│       └── admins.py
+├── handlers/                 # Обработчики сообщений
+│   ├── __init__.py
+│   ├── common.py             # Общие команды (/start, /help)
+│   ├── states.py             # Классы состояний FSM
+│   ├── admin/                # Админ-панель
+│   │   ├── __init__.py
+│   │   ├── panel.py
+│   │   ├── users_management.py
+│   │   └── broadcast.py
+│   ├── schedule/             # Работа с расписанием
+│   │   ├── __init__.py
+│   │   ├── view.py
+│   │   └── edit.py
+│   ├── teachers/             # Поиск учителей
+│   │   ├── __init__.py
+│   │   └── search.py
+│   └── homework/             # Домашние задания
+│       ├── __init__.py
+│       └── management.py
+├── keyboards/                # Клавиатуры
+│   ├── __init__.py
+│   ├── main.py               # Основное меню
+│   ├── admin.py              # Админ-клавиатуры
+│   ├── schedule.py           # Клавиатуры расписания
+│   └── teachers.py           # Клавиатуры учителей
+├── filters/                  # Кастомные фильтры
+│   ├── __init__.py
+│   └── admin.py              # Фильтр для проверки админов
+├── middlewares/              # Миддлвари (опционально)
+│   ├── __init__.py
+│   ├── logging.py            # Логирование
+│   └── user_update.py        # Обновление данных пользователя
+├── services/                 # Сервисы и утилиты
+│   ├── __init__.py
+│   ├── notifier.py           # Уведомления
+│   ├── scheduler.py          # Планировщик задач
+│   └── cleanup.py            # Очистка старых данных
+└── utils/                    # Вспомогательные функции
+    ├── __init__.py
+    ├── helpers.py            # Общие хелперы
+    └── validators.py         # Валидация данных
