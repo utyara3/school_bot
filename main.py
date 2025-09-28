@@ -20,6 +20,7 @@ from handlers import register_handlers
 from database import base as db
 from config import BOT_TOKEN, GENERAL_ADMINS, LOGGER_NAME
 from utils.bot_logging import setup_logging, get_logger
+from middlewares.anti_spam import AntiSpamMiddleware
 
 setup_logging(
     name=LOGGER_NAME,
@@ -62,6 +63,9 @@ async def main() -> None:
     # Регистрируем хендлеры
     register_handlers(dp)
     main_logger.info("Хендлеры были зарегестрированы")
+
+    dp.message.middleware(AntiSpamMiddleware())
+    main_logger.info('Анти-спам инициализирован')
 
     await bot.delete_webhook(
         drop_pending_updates=True

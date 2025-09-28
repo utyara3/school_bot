@@ -57,3 +57,8 @@ async def send_to_supports(bot: Bot, message: Message, state: FSMContext) -> Non
 
     await message.answer(msg.SUPPORT['sent_to_support'])
     await state.clear()
+
+
+@router.message()
+async def test(message: Message):
+    await message.answer("Не знаю такого...")

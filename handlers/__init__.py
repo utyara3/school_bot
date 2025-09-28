@@ -1,8 +1,9 @@
 from aiogram import Dispatcher, Router
-from handlers import common
+from handlers import common, admin
 
-ALL_ROUTERS: tuple[Router] = (
+ALL_ROUTERS: tuple[Router, Router] = (
     common.router,
+    admin.router,
 )
 
 
