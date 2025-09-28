@@ -12,3 +12,13 @@ def start_kb():
 
     builder.adjust(2)
     return builder
+
+
+def admin_kb():
+    builder = ReplyKeyboardBuilder()
+
+    for button_text in msg.REPLY_BUTTONS['admin_panel']:
+        builder.add(KeyboardButton(text=button_text))
+
+    builder.adjust(2)
+    return builder

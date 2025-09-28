@@ -1,10 +1,14 @@
 import aiosqlite
 
 from config import DATABASE_PATH
+from utils.bot_logging import get_logger
+
+logger = get_logger('database')
 
 
 async def init_db() -> None:
     """Инициализация базы данных"""
+    logger.info("Инициализация базы данных...")
     async with aiosqlite.connect(DATABASE_PATH) as conn:
         await conn.execute('PRAGMA foreign_keys = ON')
 
@@ -64,6 +68,8 @@ async def is_user_in_database(user_tg_id: int) -> bool:
 async def insert_user_to_database(tg_id: int, username: str = '', first_name: str = '', 
                                   last_name: str = '', roles: tuple[str] = ('student', )) -> None:
     """Добавить пользователя в базу данных"""
+    logger.info(f"Добавление пользователя ({tg_id}) в базу данных")
+
     async with aiosqlite.connect(DATABASE_PATH) as conn:
         await conn.execute('INSERT OR IGNORE INTO users (tg_id, username, first_name, last_name) VALUES (?, ?, ?, ?)', 
                             (tg_id, username, first_name, last_name, ))
@@ -112,6 +118,8 @@ async def has_user_role(tg_id: int, role: str) -> bool:
 
 async def add_role_to_user(tg_id: int, role_name: str) -> None:
     """Дать пользователю роль"""
+    logger.info(f"Добавление пользователю ({tg_id}) роли {role_name}")
+
     async with aiosqlite.connect(DATABASE_PATH) as conn:
         cursor = await conn.execute("SELECT id FROM users WHERE tg_id = ?", (tg_id, ))
         user = await cursor.fetchone()
@@ -130,6 +138,8 @@ async def add_role_to_user(tg_id: int, role_name: str) -> None:
 
 async def remove_role_for_user(tg_id: int, role_name: str) -> None:
     """Лишить пользователя роли"""
+    logger.info(f'Лишениие пользователя ({tg_id}) роли {role_name}')
+
     async with aiosqlite.connect(DATABASE_PATH) as conn:
         await conn.execute("""
             DELETE FROM user_roles
@@ -158,3 +168,33 @@ async def get_users_by_role(role_name: str) -> list[int]:
         return [user[0] for user in users]
     
 
+async def get_full_database_info() -> dict:
+    """Получить статистику базы данных"""
+    logger.info("Получение статистики базы данных.")
+
+    ret_info = {}
+    async with aiosqlite.connect(DATABASE_PATH) as conn:
+        #cursor = await conn.execute("""
+        #    SELECT u.tg_id, u.first_name, r.name as roles
+        #    FROM users u
+        #    JOIN user_roles ur
+        #        ON ur.user_id = u.id
+        #    JOIN roles r
+        #        ON r.id = ur.role_id           
+        #""")
+        #columns = [description[0] for description in cursor.description]
+        #ret_info['all_users'] = [dict(zip(columns, user)) for user in users]
+
+        cursor = await conn.execute("""SELECT COUNT(id) FROM users""")
+        users = await cursor.fetchall()
+
+
+    return ret_info
+
+
+async def get_number_of_users() -> int:
+    async with aiosqlite.connect(DATABASE_PATH) as conn:
+        cursor = await conn.execute("""SELECT COUNT(id) FROM users""")
+        users = await cursor.fetchone()
+
+        return int(users[0]) # type: ignore

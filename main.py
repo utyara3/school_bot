@@ -8,8 +8,8 @@ sys.path.append(
     )
 )
 
-import logging
 import asyncio
+import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
@@ -18,12 +18,20 @@ import aiogram.exceptions as aioexcepts
 
 from handlers import register_handlers
 from database import base as db
-from config import BOT_TOKEN, GENERAL_ADMINS
+from config import BOT_TOKEN, GENERAL_ADMINS, LOGGER_NAME
+from utils.bot_logging import setup_logging, get_logger
 
-logging.basicConfig(level=logging.INFO)
+setup_logging(
+    name=LOGGER_NAME,
+    log_file='bot.log',
+    level=logging.INFO
+)
 
 
 async def main() -> None:
+    main_logger = get_logger('main')
+    main_logger.info("Запуск бота...")
+
     # Инициализируем базу данных
     await db.init_db()
 
@@ -49,8 +57,11 @@ async def main() -> None:
 
             await db.insert_user_to_database(user_id, username, first_name, last_name, ('admin', ))
 
+    main_logger.info("Основные админы были добавлены в базу данных")
+
     # Регистрируем хендлеры
     register_handlers(dp)
+    main_logger.info("Хендлеры были зарегестрированы")
 
     await bot.delete_webhook(
         drop_pending_updates=True

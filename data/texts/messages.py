@@ -10,6 +10,10 @@ def format_message_to_suppport(user_id, fullname, message) -> str:
     return text
 
 
+def format_admin_panel_text(user_first_name) -> str:
+    return f"Добро пожаловать, {user_first_name}! Рады видеть вас."
+
+
 COMMON = {
     "start": """<b>Привет! 👋 Я — бот Школы №16, твой цифровой помощник!</b>.
 
@@ -37,7 +41,7 @@ SUPPORT = {
     "from_support_format": "<b>Сообщение от поддержки:</b>\n\n<i>{1}</i>"
 }
 ERRORS = {
-
+    "access_denied": "🚫 <b>Доступ запрещен. У вас не хватает прав для выполнения данного действия.</b>"
 }
 INLINE_BUTTONS = {
 
@@ -47,6 +51,10 @@ REPLY_BUTTONS = {
         '📅 Расписания', '👤 Профиль',
         '🛠️ Инструменты', '👨‍🏫 Учителя',
         '❓ Частые вопросы', '💬 Поддержка'
+    ),
+    'admin_panel' : (
+        '👑 Добавить роль', '🚫 Убрать роль',
+        '👥 Пользователи', '📊 Статистика'
     )
 }
 
