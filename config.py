@@ -10,5 +10,9 @@ LOGGER_NAME: str = getenv('LOGGER_NAME', 'school_bot')
 ANTI_SPAM_MESSAGES_PER_SECOND_WARN: int = int(getenv('ANTI_SPAM_MESSAGES_PER_SECOND', 2))
 ANTI_SPAM_MESSAGES_PER_SECOND_IGNORE: int = int(getenv('ANTI_SPAM_MESSAGES_PER_IGNORE', 4))
 
+SCHOOL_SUBJECTS = (
+    ''
+)
+
 assert BOT_TOKEN != ''
 assert DATABASE_PATH != ''

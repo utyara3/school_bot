@@ -9,7 +9,7 @@ from filters.user_role import AccessFilter
 import keyboards.inline as kb_inline
 import keyboards.reply as kb_reply
 
-import database.base as db
+import database.core as db
 import handlers.states as states
 
 
@@ -25,3 +25,5 @@ async def admin_panel_cmd(message: Message, state: FSMContext) -> None:
         msg.format_admin_panel_text(first_name),
         reply_markup=kb_reply.admin_kb().as_markup(resize_keyboard=True)
     )
+
+

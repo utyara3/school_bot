@@ -1,7 +1,7 @@
 from aiogram.filters import BaseFilter
 from aiogram.types import Message
 
-from database.base import has_user_role
+from database.users import has_user_role
 from data.texts import messages as msg
 
 

@@ -17,7 +17,8 @@ from aiogram.client.default import DefaultBotProperties
 import aiogram.exceptions as aioexcepts
 
 from handlers import register_handlers
-from database import base as db
+from database import core as core_db
+from database import users as users_db
 from config import BOT_TOKEN, GENERAL_ADMINS, LOGGER_NAME
 from utils.bot_logging import setup_logging, get_logger
 from middlewares.anti_spam import AntiSpamMiddleware
@@ -28,13 +29,14 @@ setup_logging(
     level=logging.INFO
 )
 
+main_logger = get_logger('main')
+
 
 async def main() -> None:
-    main_logger = get_logger('main')
     main_logger.info("Запуск бота...")
 
     # Инициализируем базу данных
-    await db.init_db()
+    await core_db.init_db()
 
     bot = Bot(
         token=BOT_TOKEN,
@@ -45,7 +47,7 @@ async def main() -> None:
     dp = Dispatcher()
 
     for admin_id in GENERAL_ADMINS:
-        if not await db.is_user_in_database(admin_id):
+        if not await users_db.is_user_in_database(admin_id):
             try:
                 chat = await bot.get_chat(admin_id)
             except aioexcepts.TelegramBadRequest: # Чат с админом не создан
@@ -56,7 +58,7 @@ async def main() -> None:
             first_name = chat.first_name or ''
             last_name = chat.last_name or ''
 
-            await db.insert_user_to_database(user_id, username, first_name, last_name, ('admin', ))
+            await users_db.insert_user_to_database(user_id, username, first_name, last_name, ('admin', ))
 
     main_logger.info("Основные админы были добавлены в базу данных")
 
@@ -74,4 +76,9 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        main_logger.info("Бот был остановлен.")
+    finally:
+        main_logger.info("Бот был остановлен.")

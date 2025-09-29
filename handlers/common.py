@@ -7,7 +7,7 @@ import keyboards.inline as kb_inline
 import keyboards.reply as kb_reply
 import handlers.states as states
 from data.texts import messages as msg
-import database.base as db
+import database.users as users_db
 
 router = Router()
 
@@ -18,8 +18,8 @@ async def start_cmd(message: Message) -> None:
     username = message.from_user.username or '' # type: ignore
     first_name = message.from_user.first_name # type: ignore
     last_name = message.from_user.last_name or '' # type: ignore
-    if not await db.is_user_in_database(user_id):
-        await db.insert_user_to_database(user_id, username, first_name, last_name)
+    if not await users_db.is_user_in_database(user_id):
+        await users_db.insert_user_to_database(user_id, username, first_name, last_name)
 
     await message.answer(
         msg.COMMON["start"],
@@ -49,7 +49,7 @@ async def send_to_supports(bot: Bot, message: Message, state: FSMContext) -> Non
     user_id = message.from_user.id # type: ignore
     fullname = message.from_user.fullname or '' # type: ignore
 
-    support_ids: list[int] = await db.get_users_by_role('support')
+    support_ids: list[int] = await users_db.get_users_by_role('support')
 
     for support_id in support_ids:
         await bot.send_message(chat_id=support_id, 
