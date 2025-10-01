@@ -80,5 +80,3 @@ if __name__ == "__main__":
         asyncio.run(main())
     except KeyboardInterrupt:
         main_logger.info("Бот был остановлен.")
-    finally:
-        main_logger.info("Бот был остановлен.")

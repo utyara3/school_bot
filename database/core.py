@@ -2,7 +2,7 @@ import aiosqlite
 
 from config import DATABASE_PATH
 from utils.bot_logging import get_logger
-from database import users, schedule
+from database import users, schedule, support
 
 logger = get_logger('database.core')
 
@@ -15,6 +15,7 @@ async def init_db() -> None:
 
         await schedule.create_tables(conn)
         await users.create_tables(conn)
+        await support.create_tables(conn)
 
         await schedule.insert_default_data(conn)
         await users.insert_default_data(conn)

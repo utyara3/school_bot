@@ -192,4 +192,12 @@ async def get_number_of_users() -> int:
         cursor = await conn.execute("""SELECT COUNT(id) FROM users""")
         users = await cursor.fetchone()
 
-        return int(users[0]) # type: ignore
+        return int(users[0]) 
+    
+
+async def get_all_roles() -> list[str]:
+    async with aiosqlite.connect(DATABASE_PATH) as conn:
+        cursor = await conn.execute("""SELECT name FROM roles""")
+        roles = await cursor.fetchall()
+
+        return [role[0] for role in roles]

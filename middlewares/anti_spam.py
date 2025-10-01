@@ -41,7 +41,7 @@ class AntiSpamMiddleware(BaseMiddleware):
         #очистка старых пользователей
         self._cleanup_old_users()        
 
-        user_id = event.from_user.id # type: ignore
+        user_id = event.from_user.id 
         now = time()
 
         # перезаписываем список, где перебираем все значения, и оставляем
@@ -60,7 +60,7 @@ class AntiSpamMiddleware(BaseMiddleware):
         # если больше порога для предупреждения - предупреждаем
         elif messages_count > self.messages_per_second_warn:
             if hasattr(event, 'answer'):
-                await event.answer(choice(msg.ERRORS['anti_spam'])) # type: ignore
+                await event.answer(choice(msg.ERRORS['anti_spam'])) 
             return
         
         # иначе пропускаем запрос
