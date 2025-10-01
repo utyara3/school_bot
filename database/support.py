@@ -1,4 +1,3 @@
-from optparse import Option
 import aiosqlite
 from typing import Optional, Any
 
@@ -12,19 +11,30 @@ async def create_tables(conn: aiosqlite.Connection) -> None:
             user_id INTEGER,
             support_id INTEGER,
             message_text TEXT,
-            is_answered BOOL DEFAULT FALSE,
-            answered_by INTEGER,
+            status TEXT DEFAULT 'pending',
             answer_text TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
 
 
-async def get_ticket(ticket_id: int) -> Optional[tuple[Any, ...]]:
+async def create_ticket(user_id: int, message_text: str) -> int:
     async with aiosqlite.connect(DATABASE_PATH) as conn:
         cursor = await conn.execute("""
-            SELECT id, user_id, is_answered, 
-                   answered_by, message_text
+            INSERT INTO support_tickets (user_id, status, message_text)
+            VALUES (?, ?, ?)
+        """, (user_id, 'pending', message_text, ))
+
+        await conn.commit()
+        
+        return cursor.lastrowid
+
+
+async def get_ticket(ticket_id: int) -> dict | bool:
+    async with aiosqlite.connect(DATABASE_PATH) as conn:
+        cursor = await conn.execute("""
+            SELECT id, user_id, status, 
+                   support_id, message_text
             FROM support_tickets 
             WHERE id = ?
         """, (ticket_id, ))
@@ -35,16 +45,36 @@ async def get_ticket(ticket_id: int) -> Optional[tuple[Any, ...]]:
             return dict(zip(keys,ticket))
         
         return False
-    
 
-async def create_ticket(user_id: int, message_text: str) -> int:
+
+async def set_ticket_status_pending(ticket_id: int) -> None:
     async with aiosqlite.connect(DATABASE_PATH) as conn:
-        cursor = await conn.execute("""
-            INSERT INTO support_tickets (user_id, message_text)
-            VALUES (?, ?)
-        """, (user_id, message_text, ))
-        
-        return cursor.lastrowid
-    
+        await conn.execute("""
+            UPDATE support_tickets
+            SET support_id = ?, status = ?
+            WHERE id = ?
+        """, (None, "pending", ticket_id))
 
-async def set_ticket_answered
+        await conn.commit()
+
+
+async def set_ticket_status_in_progress(ticket_id: int, support_id: int) -> None:
+    async with aiosqlite.connect(DATABASE_PATH) as conn:
+        await conn.execute("""
+            UPDATE support_tickets
+            SET support_id = ?, status = ?
+            WHERE id = ?
+        """, (support_id, "in_progress", ticket_id))
+
+        await conn.commit()
+
+
+async def set_ticket_status_resolved(ticket_id: int, answer_text: str) -> None:
+    async with aiosqlite.connect(DATABASE_PATH) as conn:
+        await conn.execute("""
+            UPDATE support_tickets
+            SET status = ?, answer_text = ?
+            WHERE id = ?
+        """, ("resolved", answer_text, ticket_id))
+
+        await conn.commit()

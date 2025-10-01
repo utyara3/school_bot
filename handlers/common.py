@@ -6,8 +6,9 @@ from aiogram.filters import Command
 import keyboards.inline as kb_inline
 import keyboards.reply as kb_reply
 import handlers.states as states
-from data.texts import messages as msg
 import database.users as users_db
+import database.support as support_db
+from data.texts import messages as msg
 
 router = Router()
 
@@ -29,9 +30,26 @@ async def start_cmd(message: Message) -> None:
 
 @router.message(Command('cancel'))
 async def cancel_cmd(message: Message, state: FSMContext) -> None:
+    current_state = await state.get_state()
+    keyboard = kb_reply.start_kb().as_markup(resize_keyboard=True)
+
+    if not current_state:
+        await message.answer(
+            msg.ERRORS['nothing_to_cancel'],
+            reply_markup=keyboard
+        )
+        return
+    
+    current_data = await state.get_data()
+    ticket = current_data['ticket_data']
+
+    if current_state == "Support:waiting_supports_answer":
+        await support_db.set_ticket_status_pending(ticket['id'])
+        await message.answer(msg.ERRORS['answer_cancelled'])
+    
     await message.answer(
         msg.COMMON['cancel'],
-        reply_markup=kb_reply.start_kb().as_markup(resize_keyboard=True)
+        reply_markup=keyboard
     )
     await state.clear()
 
@@ -51,10 +69,15 @@ async def send_to_supports(message: Message, state: FSMContext) -> None:
 
     support_ids: list[int] = await users_db.get_users_by_role('support')
 
+    ticket_id = await support_db.create_ticket(user_id, message.text)
+
+    keyboard = kb_inline.support_message_kb(ticket_id)
+
     for support_id in support_ids:
         await message.bot.send_message(
             chat_id=support_id, 
-            text=msg.format_message_to_support(user_id, fullname, message.text)
+            text=msg.format_message_to_support(user_id, fullname, message.text),
+            reply_markup=keyboard.as_markup()
         )
 
     await message.answer(msg.SUPPORT['sent_to_support'])

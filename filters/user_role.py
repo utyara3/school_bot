@@ -10,7 +10,7 @@ class AccessFilter(BaseFilter):
         self.role = role
 
     async def __call__(self, message: Message) -> bool:
-        bool_has_user_role = await has_user_role(message.from_user.id, self.role) 
+        bool_has_user_role = await has_user_role(message.from_user.id, self.role)
         if not bool_has_user_role:
             await message.answer(msg.ERRORS['access_denied'])
             

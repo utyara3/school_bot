@@ -15,10 +15,9 @@ import handlers.states as states
 
 
 router = Router()
-router.message.filter(AccessFilter('admin'))
 
 
-@router.message(Command('admin_panel'))
+@router.message(Command('admin_panel'), AccessFilter('admin'))
 async def admin_panel_cmd(message: Message, state: FSMContext) -> None:
     first_name = message.from_user.first_name 
 
@@ -30,14 +29,14 @@ async def admin_panel_cmd(message: Message, state: FSMContext) -> None:
     await state.clear()
 
 
-@router.message(F.text.lower().contains("добавить роль"))
+@router.message(F.text.lower().contains("добавить роль"), AccessFilter('admin'))
 async def admin_add_role_waiting_user_id(message: Message, state: FSMContext) -> None:
     await message.answer(msg.ADMIN['add_role_enter_id'])
 
     await state.set_state(states.Admin.add_role_waiting_user_id)
 
 
-@router.message(F.text, states.Admin.add_role_waiting_user_id)
+@router.message(F.text, states.Admin.add_role_waiting_user_id, AccessFilter('admin'))
 async def admin_add_role_waiting_role(message: Message, state: FSMContext) -> None:
     if not message.text.isdigit(): 
         await message.answer(msg.ERRORS['user_id_NaN'])
@@ -60,7 +59,7 @@ async def admin_add_role_waiting_role(message: Message, state: FSMContext) -> No
     await state.set_state(states.Admin.add_role_waiting_role)
 
 
-@router.message(F.text, states.Admin.add_role_waiting_role)
+@router.message(F.text, states.Admin.add_role_waiting_role, AccessFilter('admin'))
 async def admin_add_role(message: Message, state: FSMContext) -> None:
     role = message.text
     all_roles = await users_db.get_all_roles()
