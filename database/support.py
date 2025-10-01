@@ -2,6 +2,9 @@ import aiosqlite
 from typing import Optional, Any
 
 from config import DATABASE_PATH
+from utils.bot_logging import get_logger
+
+logger = get_logger('database.support')
 
 
 async def create_tables(conn: aiosqlite.Connection) -> None:
@@ -26,8 +29,12 @@ async def create_ticket(user_id: int, message_text: str) -> int:
         """, (user_id, 'pending', message_text, ))
 
         await conn.commit()
+
+        num = cursor.lastrowid
+
+        logger.info(f"Обращение №{num} в поддержку пользователем ({user_id})")
         
-        return cursor.lastrowid
+        return num
 
 
 async def get_ticket(ticket_id: int) -> dict | bool:
@@ -76,5 +83,7 @@ async def set_ticket_status_resolved(ticket_id: int, answer_text: str) -> None:
             SET status = ?, answer_text = ?
             WHERE id = ?
         """, ("resolved", answer_text, ticket_id))
+
+        logger.info(f"Обращение №{ticket_id} было решено.")
 
         await conn.commit()

@@ -39,11 +39,11 @@ async def cancel_cmd(message: Message, state: FSMContext) -> None:
             reply_markup=keyboard
         )
         return
-    
-    current_data = await state.get_data()
-    ticket = current_data['ticket_data']
 
     if current_state == "Support:waiting_supports_answer":
+        current_data = await state.get_data()
+        ticket = current_data['ticket_data']
+
         await support_db.set_ticket_status_pending(ticket['id'])
         await message.answer(msg.ERRORS['answer_cancelled'])
     
@@ -76,7 +76,7 @@ async def send_to_supports(message: Message, state: FSMContext) -> None:
     for support_id in support_ids:
         await message.bot.send_message(
             chat_id=support_id, 
-            text=msg.format_message_to_support(user_id, fullname, message.text),
+            text=msg.format_message_to_support(user_id, fullname, message.text, ticket_id),
             reply_markup=keyboard.as_markup()
         )
 

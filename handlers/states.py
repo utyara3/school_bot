@@ -8,5 +8,10 @@ class Support(StatesGroup):
 
 
 class Admin(StatesGroup):
+    admin_panel = State()
+    
     add_role_waiting_user_id = State()
     add_role_waiting_role = State()
+
+    remove_role_waiting_user_id = State()
+    remove_role_waiting_role = State()

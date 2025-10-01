@@ -1,6 +1,6 @@
 import aiosqlite
 
-#from config import DATABASE_PATH
+from config import DATABASE_PATH
 
 
 async def create_tables(conn: aiosqlite.Connection) -> None:
