@@ -14,6 +14,7 @@ import database.users as users_db
 import handlers.states as states
 
 from utils.bot_logging import get_logger
+from utils.pagination import UserPagination
 
 router = Router()
 logger = get_logger('handlers.admin')

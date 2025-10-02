@@ -88,6 +88,26 @@ async def insert_user_to_database(tg_id: int, username: str = '', first_name: st
         await conn.commit()
 
 
+async def get_users(limit: int, offset: int) -> list[dict]:
+    async with aiosqlite.connect(DATABASE_PATH) as conn:
+        cursor = await conn.execute("""
+            SELECT * FROM users LIMIT ? OFFSET ?
+        """, (limit, offset, ))
+        users = await cursor.fetchall()
+        descriptions = [description[0] for description in cursor.description]
+
+        return [dict(zip(descriptions, user)) for user in users]
+    
+
+async def get_user(tg_id: int) -> dict:
+    async with aiosqlite.connect(DATABASE_PATH) as conn:
+        cursor = await conn.execute("SELECT * FROM users WHERE tg_id = ?", (tg_id, ))
+        user = await cursor.fetchone()
+        descriptions = [description[0] for description in cursor.description]
+
+        return dict(zip(descriptions, user))
+    
+
 async def get_user_roles(tg_id: int) -> list[str]:
     """Получить роль пользователя"""
     async with aiosqlite.connect(DATABASE_PATH) as conn:

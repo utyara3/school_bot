@@ -82,3 +82,11 @@ async def send_to_supports(message: Message, state: FSMContext) -> None:
 
     await message.answer(msg.SUPPORT['sent_to_support'])
     await state.clear()
+    
+
+@router.message(F.text.contains("профиль"))
+async def user_profile(message: Message) -> None:
+    user = await users_db.get_user(message.from_user.id)
+
+    await message.answer(msg.format_user_info(user))
+

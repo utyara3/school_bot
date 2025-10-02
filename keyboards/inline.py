@@ -15,3 +15,7 @@ def support_message_kb(ticket_id: int) -> InlineKeyboardBuilder:
 
     return builder
     
+
+def users_pagination_kb(current_page, total_page):
+    ...
+    
